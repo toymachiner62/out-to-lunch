@@ -14,11 +14,10 @@
 const int lunchPin = 3;  // The GPIO number of the out to lunch button.
 int lunchButtonState = LOW; // Variable for reading the lunch button status
 boolean buttonPressed = false;
-String clearMessage = String("What's up STUD!!");
+int arrayCounter = 0;
 
 void setup() {
   pinMode(lunchPin, INPUT_PULLUP);
-  //digitalWrite(lunchPin, HIGH);       // turn on pullup resistors
   lcd.begin(9600);  
   
   // set the size of the display if it isn't 16x2 (you only have to do this once)
@@ -27,47 +26,30 @@ void setup() {
   lcd.write(16);  // 16 columns
   lcd.write(2);   // 2 rows
   delay(10);       
-  // we suggest putting delays after each command to make sure the data 
-  // is sent and the LCD is updated.
-  
-  clearScreen();  // Set the initial message
-  delay(1000);
 }
 
 void loop() {
 
   lunchButtonState = digitalRead(lunchPin);
-  
-  // if button was pressed
-  if(buttonPressed == false && lunchButtonState == LOW) {
-    displayLunchMessage();
-    buttonPressed = true;
-    delay(200);
-  } else if(buttonPressed == true && lunchButtonState == LOW) {
-    clearScreen();
-    buttonPressed = false;
+
+  // If the button is pressed
+  if(lunchButtonState == LOW) {
+    //clearScreen();
+    displayMessage();  // Reset the text on the screen
+    setColor(arrayCounter);
+
+    // Once we're at the end of our messages we need to loop them again
+    if(arrayCounter > 3) {
+      arrayCounter = 0;
+    } else {
+      arrayCounter++; // Increment the counter
+    }
     delay(200);
   }
 }
 
-// Sets the out to lunch message
-void displayLunchMessage() {
- // clear screen
-  lcd.write(0xFE);
-  lcd.write(0x58);
-  delay(10);
-  
- // go 'home'
-  lcd.write(0xFE);
-  lcd.write(0x48);
-  delay(10);
-  
-  lcd.print("Out to Lunch");
-  red();
-}
-
-// Sets the screen back to the original message
-void clearScreen() {
+// Sets the message
+void displayMessage() {
   // clear screen
   lcd.write(0xFE);
   lcd.write(0x58);
@@ -77,9 +59,32 @@ void clearScreen() {
   lcd.write(0xFE);
   lcd.write(0x48);
   delay(10);
-  
-  lcd.print(clearMessage);
-  blue();
+}
+
+// Sets the color of the screen
+void setColor(int counter) {
+  switch(counter) {
+    case 0:
+      blue();
+      lcd.print("What's up Stud!!");
+      break;
+    case 1:
+      red();
+      lcd.print("Out to Lunch");
+      break;
+    case 2:
+      purple();
+      lcd.print("On a Call");
+      break;
+    case 3:
+      orange();
+      lcd.print("In a Meeting");
+      break;
+    case 4:
+      green();
+      lcd.print("Out of Office");
+      break;
+  }
 }
 
 // Set the display color to red
@@ -99,6 +104,39 @@ void blue() {
   lcd.write((uint8_t)0);
   lcd.write(255); 
   lcd.write(255); 
+  //lcd.write(1);
+  delay(10);
+}
+
+// Set the display color to blue
+void purple() {
+  lcd.write(0xFE);
+  lcd.write(0xD0);
+  lcd.write(175);
+  lcd.write(1); 
+  lcd.write(175); 
+  //lcd.write(1);
+  delay(10);
+}
+
+// Set the display color to blue
+void orange() {
+  lcd.write(0xFE);
+  lcd.write(0xD0);
+  lcd.write(255);
+  lcd.write(120); 
+  lcd.write(1); 
+  //lcd.write(1);
+  delay(10);
+}
+
+// Set the display color to blue
+void green() {
+  lcd.write(0xFE);
+  lcd.write(0xD0);
+  lcd.write(255);
+  lcd.write(200); 
+  lcd.write((uint8_t)0); 
   //lcd.write(1);
   delay(10);
 }
